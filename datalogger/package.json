@@ -1,0 +1,11 @@
+{
+  "name": "weetnat_developper_test",
+  "author": "julien mathon",
+  "email": "julienmth@protonmail.com",
+  "license": "MIT",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "json-server": "0.17.1"
+  }
+}

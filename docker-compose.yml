@@ -1,0 +1,58 @@
+version: "3.9"
+
+volumes:
+  database_data:
+    name: database_data
+    driver: local
+
+services:
+  database:
+    container_name: database
+    image: postgres:14.6-alpine
+    command: [ "postgres", "-c", "log_statement=all" ]
+    healthcheck:
+      test: pg_isready -U postgres -d wheather
+      interval: 20s
+      timeout: 60s
+      retries: 1
+      start_period: 30s
+    ports:
+      - "0.0.0.0:5432:5432"
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+    env_file:
+      - "./backend/.env.dev"
+
+  datalogger:
+    build:
+      context: ./datalogger/
+      dockerfile: Dockerfile
+    container_name: datalogger
+    ports:
+      - "3000:3000"
+    command: yarn run json-server --port 3000 --host 0.0.0.0 db.json
+
+  backend:
+    container_name: backend
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - ./backend:/backend
+    command: uvicorn main:app --reload --host 0.0.0.0 --port 80
+    env_file:
+      - "./backend/.env.dev"
+    ports:
+      - "80:80"
+
+  pgadmin:
+    container_name: pgadmin4
+    image: dpage/pgadmin4
+    depends_on:
+      - database
+    env_file:
+      - "./backend/.env.dev"

@@ -1,0 +1,10 @@
+numpy
+uvicorn
+fastapi
+sqlalchemy
+sqlalchemy-serializer
+databases[asyncpg]
+psycopg2-binary
+requests
+httpx
+pytest
